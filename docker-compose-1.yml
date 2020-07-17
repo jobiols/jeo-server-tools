@@ -1,0 +1,65 @@
+# ejemplo de dos sitios en el mismo vps, cada uno con su certificado letsencrypt
+#  para probarlo se requiere:
+#  crear los dos sitios en /home/ubuntu/www y /home/ubuntu/www2
+#  tener un dns con dos nombres staging.jeosoft.com.ar y pruebas.jeosoft.com.ar apuntando a la ip del vps
+#  tener una cuenta en letsencrypt con el mail jorge.obiols@gmail.com
+#  tener abiertos en el vps los puertos 80 y 443
+#
+version: "3"
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes: 
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs:ro
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy  
+
+  letsencrypt:
+    container_name: letsencrypt
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - vhostd:/etc/nginx/vhost.d  
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  www:
+    image: nginx
+    restart: always
+    expose:
+      - "80"
+    volumes:
+      - /home/ubuntu/www3:/usr/share/nginx/html:ro
+    environment:
+      - VIRTUAL_HOST=staging.jeosoft.com.ar
+      - LETSENCRYPT_HOST=staging.jeosoft.com.ar
+      - LETSENCRYPT_EMAIL=jorge.obiols@gmail.com
+
+  www2:
+    image: nginx
+    restart: always
+    expose:
+      - "80"
+    volumes:
+      - /home/ubuntu/www:/usr/share/nginx/html:ro
+    environment:
+      - VIRTUAL_HOST=pruebas.jeosoft.com.ar
+      - LETSENCRYPT_HOST=pruebas.jeosoft.com.ar
+      - LETSENCRYPT_EMAIL=jorge.obiols@gmail.com
+
+volumes:        
+  certs:
+  html:
+  vhostd:

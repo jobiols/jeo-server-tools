@@ -1,13 +1,51 @@
-# ejemplo de dos sitios en el mismo vps, cada uno con su certificado letsencrypt
-#  para probarlo se requiere:
-#  crear los dos sitios en /home/ubuntu/www y /home/ubuntu/www2
-#  tener un dns con dos nombres staging.jeosoft.com.ar y pruebas.jeosoft.com.ar apuntando a la ip del vps
-#  tener una cuenta en letsencrypt con el mail jorge.obiols@gmail.com
-#  tener abiertos en el vps los puertos 80 y 443
-#
-version: "3"
+# Compose file odoo test13
+# Version 2020-07-17
+
+version: '3.5'
 
 services:
+
+  postgres:
+    image: postgres:10.1-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+
+  test13:
+    image: jobiols/odoo-jeo:13.0
+    container_name: test13
+    restart: always
+    volumes:
+      - /odoo_ar/odoo-13.0/test13/config:/opt/odoo/etc/
+      - /odoo_ar/odoo-13.0/test13/data_dir:/opt/odoo/data
+      - /odoo_ar/odoo-13.0/test13/log:/var/log/odoo
+      - /odoo_ar/odoo-13.0/test13/sources:/opt/odoo/custom-addons
+      - /odoo_ar/odoo-13.0/test13/backup_dir:/var/odoo/backups/
+    links:
+      - postgres:db
+    environment:
+      - ODOO_CONF=/dev/null
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    expose:
+      - "80"
+    volumes:
+      - /odoo_ar/nginx/conf/:/etc/nginx/conf.d:ro
+      - /odoo_ar/nginx/log:/var/log/nginx/
+    links:
+      - test13
+    environment:
+      - VIRTUAL_HOST=staging.jeosoft.com.ar
+      - LETSENCRYPT_HOST=staging.jeosoft.com.ar
+      - LETSENCRYPT_EMAIL=jorge.obiols@gmail.com
+
   nginx-proxy:
     image: jwilder/nginx-proxy
     container_name: nginx-proxy
@@ -15,51 +53,28 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    volumes: 
+    volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - certs:/etc/nginx/certs:ro
       - vhostd:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
     labels:
-      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy  
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
 
   letsencrypt:
-    container_name: letsencrypt
     image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: companion
     restart: always
     environment:
       - NGINX_PROXY_CONTAINER=nginx-proxy
     volumes:
       - certs:/etc/nginx/certs:rw
-      - vhostd:/etc/nginx/vhost.d  
+      - vhostd:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-  www:
-    image: nginx
-    restart: always
-    expose:
-      - "80"
-    volumes:
-      - /home/ubuntu/www3:/usr/share/nginx/html:ro
-    environment:
-      - VIRTUAL_HOST=staging.jeosoft.com.ar
-      - LETSENCRYPT_HOST=staging.jeosoft.com.ar
-      - LETSENCRYPT_EMAIL=jorge.obiols@gmail.com
-
-  www2:
-    image: nginx
-    restart: always
-    expose:
-      - "80"
-    volumes:
-      - /home/ubuntu/www:/usr/share/nginx/html:ro
-    environment:
-      - VIRTUAL_HOST=pruebas.jeosoft.com.ar
-      - LETSENCRYPT_HOST=pruebas.jeosoft.com.ar
-      - LETSENCRYPT_EMAIL=jorge.obiols@gmail.com
-
-volumes:        
+volumes:
   certs:
   html:
   vhostd:
+  postgresql:
