@@ -1,0 +1,91 @@
+# Compose file odoo test con dos sitios y letsencrypt
+# Version 2019-01-07
+
+version: '3.5'
+
+services:
+  traefik:
+    image: traefik:2.2.6
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - --entrypoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      - --log.level=DEBUG
+      - --log.format=json
+      - --providers.docker
+      - --api.insecure # Don't do that in production
+      - --api.debug
+
+      - --certificatesresolvers.le.acme.email=jorge.obiols@gmail.com
+      - --certificatesresolvers.le.acme.storage=/opt/traefik/acme.json
+      - --certificatesresolvers.le.acme.httpChallenge=true
+      - --certificatesresolvers.le.acme.httpChallenge.entryPoint=web
+#      - --certificatesresolvers.le.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /odoo_ar/traefik/acme.json:/opt/traefik/acme.json
+
+  postgres:
+    image: postgres:10.1-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+
+  odoo:
+    image: jobiols/odoo-jeo:13.0
+    container_name: odoo
+    restart: unless-stopped
+    volumes:
+      - /odoo_ar/odoo-13.0/test13/config:/opt/odoo/etc/
+      - /odoo_ar/odoo-13.0/test13/data_dir:/opt/odoo/data
+      - /odoo_ar/odoo-13.0/test13/log:/var/log/odoo
+      - /odoo_ar/odoo-13.0/test13/sources:/opt/odoo/custom-addons
+      - /odoo_ar/odoo-13.0/test13/backup_dir:/var/odoo/backups/
+    links:
+      - postgres:db
+    environment:
+      - ODOO_CONF=/dev/null
+
+    labels:
+      - traefik.http.routers.rou-odoo.rule=Host(`staging.jeosoft.com.ar`)
+      - traefik.http.routers.rou-odoo.entrypoints=web
+
+        #      - traefik.http.routers.rou-chat.rule=(Host(`test13sas.com`) || Host(`lacavadecervezas.com`) || Host(`lacavaescondida.com`)) && PathPrefix(`/longpolling`)
+        #      - traefik.http.routers.rou-chat.entrypoints=web
+
+      # comprime las paginas.
+      - traefik.http.middlewares.compress.compress=true
+
+      # redireccion http -> https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true
+      - traefik.http.routers.rou-odoo.middlewares=redirect-to-https@docker
+      - traefik.http.routers.rou-chat.middlewares=redirect-to-https@docker
+
+      - traefik.http.routers.rou-odoo-secure.rule=Host(`staging.jeosoft.com.ar`)
+      - traefik.http.routers.rou-odoo-secure.tls=true
+      - traefik.http.routers.rou-odoo-secure.tls.certresolver=le
+      - traefik.http.routers.rou-odoo-secure.entrypoints=websecure
+      # redirecciona al puerto 8069 de odoo
+      - traefik.http.routers.rou-odoo-secure.service=srv-odoo-secure
+      - traefik.http.services.srv-odoo-secure.loadbalancer.server.port=8069
+
+        #      - traefik.http.routers.rou-chat-secure.rule=(Host(`test13sas.com`) || Host(`lacavadecervezas.com`) || Host(`lacavaescondida.com`)) && PathPrefix(`/longpolling`)
+        #      - traefik.http.routers.rou-chat-secure.tls=true
+        #      - traefik.http.routers.rou-chat-secure.tls.certresolver=le
+        #      - traefik.http.routers.rou-chat-secure.entrypoints=websecure
+      # redirecciona al puerto 8072
+      #      - traefik.http.routers.rou-chat-secure.service=srv-chat-secure
+      #      - traefik.http.services.srv-chat-secure.loadbalancer.server.port=8072
+
+volumes:
+  postgresql:
