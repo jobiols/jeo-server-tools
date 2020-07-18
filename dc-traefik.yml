@@ -1,5 +1,5 @@
 # Compose file odoo test13 y letsencrypt
-# Version 2020-07-17
+# Version 2020-07-18
 
 version: '3.5'
 
@@ -13,8 +13,8 @@ services:
       - --entryPoints.websecure.address=:443
 #      - --log.level=DEBUG
       - --providers.docker
-      - --api.insecure # Don't do that in production
-      - --api.debug
+#      - --api.insecure # Don't do that in production
+#      - --api.debug
 
       - --certificatesresolvers.le.acme.email=jorge.obiols@gmail.com
       - --certificatesresolvers.le.acme.storage=/opt/traefik/acme.json
@@ -38,7 +38,7 @@ services:
       - POSTGRES_USER=odoo
       - POSTGRES_PASSWORD=odoo
     volumes:
-      - postgresql:/var/lib/postgresql/data
+      - /odoo_ar/odoo-13.0/test13/postgresql:/var/lib/postgresql/data
 
   odoo:
     image: jobiols/odoo-jeo:13.0
@@ -94,6 +94,3 @@ services:
       # redirecciona rout-chat-secure al puerto 8072 donde odoo escucha el longpolling
       - traefik.http.routers.rou-chat-secure.service=srv-chat-secure
       - traefik.http.services.srv-chat-secure.loadbalancer.server.port=8072
-
-volumes:
-  postgresql:
