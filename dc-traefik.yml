@@ -1,6 +1,5 @@
-# Compose file odoo test con dos sitios y letsencrypt
+# Compose file odoo test13 y letsencrypt
 # Version 2020-07-17
-# rou-odoo-secure@docker uses a non-existent resolver: le"
 
 version: '3.5'
 
@@ -12,8 +11,8 @@ services:
     command:
       - --entrypoints.web.address=:80
       - --entryPoints.websecure.address=:443
-      - --log.level=DEBUG
-      - --log.format=json
+#      - --log.level=DEBUG
+#      - --log.format=json
       - --providers.docker
       - --api.insecure # Don't do that in production
       - --api.debug
@@ -30,7 +29,7 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /odoo_ar/traefik/acme.json:/opt/traefik/acme.json
+      - /odoo_ar/traefik/:/opt/traefik/
 
   postgres:
     image: postgres:10.1-alpine
