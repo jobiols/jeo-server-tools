@@ -1,4 +1,4 @@
-# Compose file odoo test13 y letsencrypt
+# Compose file odoo makeover y letsencrypt
 # Version 2020-07-18
 # Ojo hay que crear el /odoo_ar/traefik/acme.json y ponerle chmod 600
 
@@ -26,43 +26,48 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
+#      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /odoo_ar/traefik/:/opt/traefik/
 
   postgres:
-    image: postgres:10.1-alpine
+    image: postgres:9.5
     container_name: postgres
     restart: unless-stopped
     environment:
       - POSTGRES_USER=odoo
       - POSTGRES_PASSWORD=odoo
     volumes:
-      - /odoo_ar/odoo-13.0/test13/postgresql:/var/lib/postgresql/data
+      - /odoo_ar/odoo-8.0/makeover/postgresql:/var/lib/postgresql/data
+
+  aeroo:
+    image: jobiols/aeroo-docs
+    container_name: aeroo
 
   odoo:
-    image: jobiols/odoo-jeo:13.0
+    image: jobiols/odoo-jeo:8.0
     container_name: odoo
     restart: unless-stopped
     volumes:
-      - /odoo_ar/odoo-13.0/test13/config:/opt/odoo/etc/
-      - /odoo_ar/odoo-13.0/test13/data_dir:/opt/odoo/data
-      - /odoo_ar/odoo-13.0/test13/log:/var/log/odoo
-      - /odoo_ar/odoo-13.0/test13/sources:/opt/odoo/custom-addons
-      - /odoo_ar/odoo-13.0/test13/backup_dir:/var/odoo/backups/
+      - /odoo_ar/odoo-8.0/makeover/config:/opt/odoo/etc/
+      - /odoo_ar/odoo-8.0/makeover/data_dir:/opt/odoo/data
+      - /odoo_ar/odoo-8.0/makeover/log:/var/log/odoo
+      - /odoo_ar/odoo-8.0/makeover/sources:/opt/odoo/custom-addons
+      - /odoo_ar/odoo-8.0/makeover/backup_dir:/var/odoo/backups/
     links:
       - postgres:db
+      - aeroo:aeroo
     environment:
       - ODOO_CONF=/dev/null
 
     labels:
       # router rou-odoo --> Acceso a odoo en puerto 80
-      - traefik.http.routers.rou-odoo.rule=Host(`traf.jeosoft.com.ar`)
+      - traefik.http.routers.rou-odoo.rule=Host(`odoo.makeoverlab.com.ar`)
       - traefik.http.routers.rou-odoo.entrypoints=web
 
       # router rou-chat --> Acceso a /longpolling en puerto 80
-      - traefik.http.routers.rou-chat.rule=(Host(`traf.jeosoft.com.ar`)) && PathPrefix(`/longpolling`)
+      - traefik.http.routers.rou-chat.rule=(Host(`odoo.makeoverlab.com.ar`)) && PathPrefix(`/longpolling`)
       - traefik.http.routers.rou-chat.entrypoints=web
 
       # Middleware para comprimir paginas.
@@ -77,7 +82,7 @@ services:
       - traefik.http.routers.rou-chat.middlewares=redirect-to-https@docker
 
       # router rou-odoo-secure --> Acceso a odoo en puerto 443
-      - traefik.http.routers.rou-odoo-secure.rule=Host(`traf.jeosoft.com.ar`)
+      - traefik.http.routers.rou-odoo-secure.rule=Host(`odoo.makeoverlab.com.ar`)
       - traefik.http.routers.rou-odoo-secure.tls=true
       - traefik.http.routers.rou-odoo-secure.tls.certresolver=le
       - traefik.http.routers.rou-odoo-secure.entrypoints=websecure
@@ -87,7 +92,7 @@ services:
       - traefik.http.services.srv-odoo-secure.loadbalancer.server.port=8069
 
       # Router rou-chat-secure --> Acceso a odoo en puerto 443
-      - traefik.http.routers.rou-chat-secure.rule=(Host(`traf.jeosoft.com.ar`)) && PathPrefix(`/longpolling`)
+      - traefik.http.routers.rou-chat-secure.rule=(Host(`odoo.makeoverlab.com.ar`)) && PathPrefix(`/longpolling`)
       - traefik.http.routers.rou-chat-secure.tls=true
       - traefik.http.routers.rou-chat-secure.tls.certresolver=le
       - traefik.http.routers.rou-chat-secure.entrypoints=websecure
