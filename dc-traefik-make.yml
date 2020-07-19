@@ -101,3 +101,48 @@ services:
 #      - traefik.http.routers.rou-chat-secure.service=srv-chat-secure
 #      - traefik.http.services.srv-chat-secure.loadbalancer.server.port=8072
 
+  netdata:
+    container_name: netdata
+    image: netdata/netdata
+    hostname: odoo.makeoverlab.com.ar
+    restart: unless-stopped
+    ports: 
+      - 19999:19999
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - netdatalib:/var/lib/netdata
+      - netdatacache:/var/cache/netdata
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+    environment:
+      - PGID=998
+#      - VIRTUALIZATION=${VIRTUALIZATION}
+    labels:
+      # router rou-ndata --> Acceso a netdata en puerto 80
+      - traefik.http.routers.rou-ndata.rule=(Host(`odoo.makeoverlab.com.ar`)) && PathPrefix(`/netdata`)
+      - traefik.http.routers.rou-ndata.entrypoints=web
+
+      # Asigno los middlewares de redireccion a los routers  
+      - traefik.http.routers.rou-ndata.middlewares=redirect-to-https@docker
+
+      # Router rou-ndata-secure --> Acceso a ndata en puerto 443
+      - traefik.http.routers.rou-ndata-secure.rule=(Host(`odoo.makeoverlab.com.ar`)) && PathPrefix(`/netdata`)
+      - traefik.http.routers.rou-ndata-secure.tls=true
+      - traefik.http.routers.rou-ndata-secure.tls.certresolver=le
+      - traefik.http.routers.rou-ndata-secure.entrypoints=websecure
+
+      # redirecciona rout-ndata-secure al puerto 19999 donde ndata escucha
+      - traefik.http.routers.rou-ndata-secure.service=srv-ndata-secure
+      - traefik.http.services.srv-ndata-secure.loadbalancer.server.port=19999
+
+
+volumes:
+  netdatalib:
+  netdatacache:
