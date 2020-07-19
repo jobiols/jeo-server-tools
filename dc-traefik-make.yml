@@ -98,5 +98,5 @@ services:
       - traefik.http.routers.rou-chat-secure.entrypoints=websecure
 
       # redirecciona rout-chat-secure al puerto 8072 donde odoo escucha el longpolling
-      - traefik.http.routers.rou-chat-secure.service=srv-chat-secure
-      - traefik.http.services.srv-chat-secure.loadbalancer.server.port=8072
+#      - traefik.http.routers.rou-chat-secure.service=srv-chat-secure
+#      - traefik.http.services.srv-chat-secure.loadbalancer.server.port=8072
