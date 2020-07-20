@@ -59,7 +59,7 @@ services:
 #      - VIRTUALIZATION=${VIRTUALIZATION}
     labels:
       # router rou-ndata --> Acceso a netdata en puerto 80
-      - traefik.http.routers.rou-ndata.rule=Host(`odoo.makeoverlab.com.ar`)
+      - traefik.http.routers.rou-ndata.rule=(Host(`odoo.makeoverlab.com.ar`)) && PathPrefix(`/netdata`)
       - traefik.http.routers.rou-ndata.entrypoints=web
 
       # Middleware para redireccionar redireccion http -> https
@@ -70,7 +70,7 @@ services:
       - traefik.http.routers.rou-ndata.middlewares=redirect-to-https@docker
 
       # Router rou-ndata-secure --> Acceso a ndata en puerto 443
-      - traefik.http.routers.rou-ndata-secure.rule=Host(`odoo.makeoverlab.com.ar`)
+      - traefik.http.routers.rou-ndata-secure.rule=(Host(`odoo.makeoverlab.com.ar`)) && PathPrefix(`/netdata`)
       - traefik.http.routers.rou-ndata-secure.tls=true
       - traefik.http.routers.rou-ndata-secure.tls.certresolver=le
       - traefik.http.routers.rou-ndata-secure.entrypoints=websecure
