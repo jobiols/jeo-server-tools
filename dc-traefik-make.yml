@@ -14,8 +14,8 @@ services:
       - --entryPoints.websecure.address=:443
 #      - --log.level=DEBUG
       - --providers.docker
-#      - --api.insecure # Don't do that in production
-#      - --api.debug
+      - --api.insecure # Don't do that in production
+      - --api.debug
 
       - --certificatesresolvers.le.acme.email=jorge.obiols@gmail.com
       - --certificatesresolvers.le.acme.storage=/opt/traefik/acme.json
@@ -26,7 +26,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-#      - "8080:8080"
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /odoo_ar/traefik/:/opt/traefik/
@@ -41,7 +41,7 @@ services:
     hostname: odoo.makeoverlab.com.ar
     restart: unless-stopped
     ports: 
-      - 80:19999
+      - 19999:19999
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -72,8 +72,8 @@ services:
       - traefik.http.routers.rou-ndata-secure.entrypoints=websecure
 
       # redirecciona rout-ndata-secure al puerto 19999 donde ndata escucha
-#      - traefik.http.routers.rou-ndata-secure.service=srv-ndata-secure
-#      - traefik.http.services.srv-ndata-secure.loadbalancer.server.port=19999
+      - traefik.http.routers.rou-ndata-secure.service=srv-ndata-secure
+      - traefik.http.services.srv-ndata-secure.loadbalancer.server.port=19999
 
 volumes:
   netdatalib:
