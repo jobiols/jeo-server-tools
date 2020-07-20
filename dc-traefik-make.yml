@@ -31,16 +31,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /odoo_ar/traefik/:/opt/traefik/
 
-  postgres:
-    image: postgres:9.5
-    container_name: postgres
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=odoo
-      - POSTGRES_PASSWORD=odoo
-    volumes:
-      - /odoo_ar/odoo-8.0/makeover/postgresql:/var/lib/postgresql/data
-
   aeroo:
     image: jobiols/aeroo-docs
     container_name: aeroo
