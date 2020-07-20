@@ -62,6 +62,10 @@ services:
       - traefik.http.routers.rou-ndata.rule=Host(`odoo.makeoverlab.com.ar`)
       - traefik.http.routers.rou-ndata.entrypoints=web
 
+      # Middleware para redireccionar redireccion http -> https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true
+
       # Asigno los middlewares de redireccion a los routers  
       - traefik.http.routers.rou-ndata.middlewares=redirect-to-https@docker
 
