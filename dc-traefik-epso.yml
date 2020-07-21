@@ -85,15 +85,14 @@ services:
       - "138:138/udp"
       - "139:139/tcp"
       - "445:445/tcp"    
+    stdin_open: true
     read_only: true
     tmpfs: 
       - /tmp
-    stdin_open: true
     tty: true
     volumes:
-      - /mnt:/mnt:z
-#      - /mnt2:/mnt2:z
-    command: '-s "Mount;/mnt" -s "Odoo Backup;/mnt;yes;no;no;odoo" -u "odoo;odoo" -p'
+      - /odoo_ar/odoo-11.0/epso/backup_dir:/mnt
+    command: '-u "jobiols;melquiades" -s "Odoo Backup epso;/mnt;yes;no;no;jobiols;;;Archivos de backup diarios maximo 30 dias." -p'
 
 networks:
   default:

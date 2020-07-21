@@ -13,14 +13,13 @@ services:
       - "138:138/udp"
       - "139:139/tcp"
       - "445:445/tcp"    
+    stdin_open: true
     read_only: true
     tmpfs: 
       - /tmp
-    stdin_open: true
     tty: true
     volumes:
       - /mnt:/mnt
-#      - /mnt2:/mnt2:z
     command: '-s "Odoo Backup 1;/mnt;yes;yes;yes;;;;Archivos de backup diarios maximo 30 dias." -p'
 
 networks:
