@@ -19,7 +19,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - /mnt:/mnt:z
+      - /mnt:/mnt
 #      - /mnt2:/mnt2:z
     command: '-s "Odoo Backup 1;/mnt;yes;yes;yes;;;;Archivos de backup diarios maximo 30 dias." -p'
 

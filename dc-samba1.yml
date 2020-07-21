@@ -1,0 +1,13 @@
+version: '3.5'
+services:
+  samba:
+    image: dperson/samba
+    container_name: samba
+    restart: unless-stopped
+    ports:
+      - "139:139"
+      - "445:445"    
+    stdin_open: true
+    volumes:
+      - /mnt:/mnt
+    command: '-u "jobiols;melquiades" -s "Odoo Backup epso;/mnt;yes;no;no;jobiols;;;Archivos de backup diarios maximo 30 dias." -p'
