@@ -1,0 +1,99 @@
+# Compose file odoo epso + samba
+# Version 2020-07-18
+# Ojo hay que crear el /odoo_ar/traefik/acme.json y ponerle chmod 600
+
+version: '3.5'
+
+services:
+  traefik:
+    image: traefik:2.2.6
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - --entrypoints.web.address=:80
+#      - --log.level=DEBUG
+      - --providers.docker
+      - --api.insecure # Don't do that in production
+      - --api.debug
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /odoo_ar/traefik/:/opt/traefik/
+
+  postgres:
+    image: postgres:10.1-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+    volumes:
+      - /odoo_ar/odoo-11.0/epso/postgresql:/var/lib/postgresql/data
+
+  aeroo:
+    image: jobiols/aeroo-docs
+    container_name: aeroo
+
+  odoo:
+    image: jobiols/odoo-jeo:11.0
+    container_name: odoo
+    restart: unless-stopped
+    volumes:
+      - /odoo_ar/odoo-11.0/epso/config:/opt/odoo/etc/
+      - /odoo_ar/odoo-11.0/epso/data_dir:/opt/odoo/data
+      - /odoo_ar/odoo-11.0/epso/log:/var/log/odoo
+      - /odoo_ar/odoo-11.0/epso/sources:/opt/odoo/custom-addons
+      - /odoo_ar/odoo-11.0/epso/backup_dir:/var/odoo/backups/
+    links:
+      - postgres:db
+      - aeroo:aeroo
+    environment:
+      - ODOO_CONF=/dev/null
+
+    labels:
+      # router rou-odoo --> Acceso a odoo en puerto 80
+      - traefik.http.routers.rou-odoo.rule=Host(`localhost`)
+      - traefik.http.routers.rou-odoo.entrypoints=web
+
+      # router rou-chat --> Acceso a /longpolling en puerto 80
+      - traefik.http.routers.rou-chat.rule=(Host(`localhost`)) && PathPrefix(`/longpolling`)
+      - traefik.http.routers.rou-chat.entrypoints=web
+
+      # Middleware para comprimir paginas.
+      - traefik.http.middlewares.compress.compress=true
+      
+      # Redirecciona rou-odoo al puert 8069 donde escucha odoo
+      - traefik.http.routers.rou-odoo.service=srv-odoo
+      - traefik.http.services.srv-odoo.loadbalancer.server.port=8069
+
+      # redirecciona rout-chat al puerto 8072 donde odoo escucha el longpolling
+      - traefik.http.routers.rou-chat.service=srv-chat
+      - traefik.http.services.srv-chat.loadbalancer.server.port=8072
+
+  samba:
+    image: dperson/samba
+    container_name: samba
+    restart: unless-stopped
+    environment:
+      TZ: 'America/Argentina/Buenos_Aires'
+    networks:
+      - default
+    ports:
+      - "137:137/udp"
+      - "138:138/udp"
+      - "139:139/tcp"
+      - "445:445/tcp"    
+    read_only: true
+    tmpfs: 
+      - /tmp
+    stdin_open: true
+    tty: true
+    volumes:
+      - /mnt:/mnt:z
+#      - /mnt2:/mnt2:z
+    command: '-s "Mount;/mnt" -s "Odoo Backup;/mnt;yes;no;no;odoo" -u "odoo;odoo" -p'
+
+networks:
+  default:
