@@ -1,4 +1,4 @@
-# Compose file odoo ingelec epso + samba
+# Compose file odoo ingeleco epso + samba
 # Version 2020-07-18
 
 version: '3.5'
@@ -29,7 +29,7 @@ services:
       - POSTGRES_USER=odoo
       - POSTGRES_PASSWORD=odoo
     volumes:
-      - /odoo_ar/odoo-11.0/ingelec/postgresql:/var/lib/postgresql/data
+      - /odoo_ar/odoo-11.0/ingeleco/postgresql:/var/lib/postgresql/data
 
   aeroo:
     image: jobiols/aeroo-docs
@@ -40,11 +40,11 @@ services:
     container_name: odoo
     restart: unless-stopped
     volumes:
-      - /odoo_ar/odoo-11.0/ingelec/config:/opt/odoo/etc/
-      - /odoo_ar/odoo-11.0/ingelec/data_dir:/opt/odoo/data
-      - /odoo_ar/odoo-11.0/ingelec/log:/var/log/odoo
-      - /odoo_ar/odoo-11.0/ingelec/sources:/opt/odoo/custom-addons
-      - /odoo_ar/odoo-11.0/ingelec/backup_dir:/var/odoo/backups/
+      - /odoo_ar/odoo-11.0/ingeleco/config:/opt/odoo/etc/
+      - /odoo_ar/odoo-11.0/ingeleco/data_dir:/opt/odoo/data
+      - /odoo_ar/odoo-11.0/ingeleco/log:/var/log/odoo
+      - /odoo_ar/odoo-11.0/ingeleco/sources:/opt/odoo/custom-addons
+      - /odoo_ar/odoo-11.0/ingeleco/backup_dir:/var/odoo/backups/
     links:
       - postgres:db
       - aeroo:aeroo
@@ -90,8 +90,8 @@ services:
       - /tmp
     tty: true
     volumes:
-      - /odoo_ar/odoo-11.0/ingelec/backup_dir:/mnt
-    command: '-u "ingelec;inge***" -s "Odoo Backup Ingelec;/mnt;yes;yes;no;ingelec;;;Archivos de backup diarios maximo 30 dias." -p'
+      - /odoo_ar/odoo-11.0/ingeleco/backup_dir:/mnt
+    command: '-u "ingeleco;inge***" -s "Odoo Backup Ingeleco;/mnt;yes;yes;no;ingeleco;;;Archivos de backup diarios maximo 30 dias." -p'
 
     # -s "<name;/path>[;browse;readonly;guest;users;admins;writelist;comment]"
     # -u "<username;password>[;ID;group;GID]"
