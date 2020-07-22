@@ -1,4 +1,4 @@
-# Compose file odoo epso + samba
+# Compose file odoo epso + samba + netdata
 # Version 2020-07-18
 
 version: '3.5'
@@ -22,7 +22,7 @@ services:
       - /odoo_ar/traefik/:/opt/traefik/
 
   postgres:
-    image: postgres:10.1-alpine
+    image: postgres:11.1-alpine
     container_name: postgres
     restart: unless-stopped
     environment:
@@ -48,8 +48,8 @@ services:
     links:
       - postgres:db
       - aeroo:aeroo
-    environment:
-      - ODOO_CONF=/dev/null
+#    environment:
+#      - ODOO_CONF=/dev/null
 
     labels:
       # router rou-odoo --> Acceso a odoo en puerto 80
@@ -115,8 +115,6 @@ services:
 
   # obtener el PGID
   # grep docker /etc/group | cut -d ':' -f 3
-
-
 
 networks:
   default:
