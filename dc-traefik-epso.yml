@@ -53,11 +53,11 @@ services:
 
     labels:
       # router rou-odoo --> Acceso a odoo en puerto 80
-      - traefik.http.routers.rou-odoo.rule=Host(`192.168.0.162`)
+      - traefik.http.routers.rou-odoo.rule=Host(`192.168.0.162`) || Host(`http://sams.sytes.net`)
       - traefik.http.routers.rou-odoo.entrypoints=web
 
       # router rou-chat --> Acceso a /longpolling en puerto 80
-      - traefik.http.routers.rou-chat.rule=(Host(`192.168.0.162`)) && PathPrefix(`/longpolling`)
+      - traefik.http.routers.rou-chat.rule=(Host(`192.168.0.162`) || Host(`http://sams.sytes.net`)) && PathPrefix(`/longpolling`)
       - traefik.http.routers.rou-chat.entrypoints=web
 
       # Middleware para comprimir paginas.
