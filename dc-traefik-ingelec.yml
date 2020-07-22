@@ -48,8 +48,8 @@ services:
     links:
       - postgres:db
       - aeroo:aeroo
-    environment:
-      - ODOO_CONF=/dev/null
+#    environment:
+#      - ODOO_CONF=/dev/null
 
     labels:
       # router rou-odoo --> Acceso a odoo en puerto 80
