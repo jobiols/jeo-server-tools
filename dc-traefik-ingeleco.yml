@@ -90,7 +90,7 @@ services:
       - /tmp
     tty: true
     volumes:
-      - /odoo_ar/odoo-11.0/ingeleco/backup_dir:/mnt
+      - /odoo_ar/odoo-11.0/ingeleco/backup_dir:/mnt:ro
     command: '-u "ingeleco;inge***" -s "Odoo Backup Ingeleco;/mnt;yes;yes;no;ingeleco;;;Archivos de backup diarios maximo 30 dias." -p'
 
     # -s "<name;/path>[;browse;readonly;guest;users;admins;writelist;comment]"

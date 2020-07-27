@@ -90,7 +90,7 @@ services:
       - /tmp
     tty: true
     volumes:
-      - /odoo_ar/odoo-11.0/epso/backup_dir:/mnt
+      - /odoo_ar/odoo-11.0/epso/backup_dir:/mnt:ro
     command: '-u "epso;epso***" -s "Odoo Backup Epso;/mnt;yes;yes;no;epso;;;Archivos de backup diarios maximo 30 dias." -p'
     
     # -s "<name;/path>[;browse;readonly;guest;users;admins;writelist;comment]"
