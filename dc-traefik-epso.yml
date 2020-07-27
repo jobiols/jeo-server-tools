@@ -12,11 +12,11 @@ services:
       - --entrypoints.web.address=:80
 #      - --log.level=DEBUG
       - --providers.docker
-      - --api.insecure # Don't do that in production
-      - --api.debug
+#      - --api.insecure # Don't do that in production
+#      - --api.debug
     ports:
       - "80:80"
-      - "8080:8080"
+#      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /odoo_ar/traefik/:/opt/traefik/
