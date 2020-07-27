@@ -57,7 +57,7 @@ services:
       - traefik.http.routers.rou-odoo.entrypoints=web
 
       # router rou-chat --> Acceso a /longpolling en puerto 80
-      - traefik.http.routers.rou-chat.rule=(Method(`GET`) || Method(`POST`) || Method(`PUT`)) || Host(`http://sams.sytes.net`)) && PathPrefix(`/longpolling`)
+      - traefik.http.routers.rou-chat.rule=(Method(`GET`) || Method(`POST`) || Method(`PUT`)) && PathPrefix(`/longpolling`)
       - traefik.http.routers.rou-chat.entrypoints=web
 
       # Middleware para comprimir paginas.
@@ -112,9 +112,16 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - PGID=998  
+      # obtener el PGID
+      # grep docker /etc/group | cut -d ':' -f 3
+    # labels:
+    #   # router rou-netdata --> Acceso a netdata en puerto 80
+    #   - traefik.http.routers.rou-netdata.rule=(  Method(`GET`) || Method(`POST`) || Method(`PUT`)   ) && Path(`/netdata`)
+    #   - traefik.http.routers.rou-netdata.entrypoints=web
 
-  # obtener el PGID
-  # grep docker /etc/group | cut -d ':' -f 3
+    #   # Redirecciona rou-odoo al puert 19999 donde escucha netdata
+    #   - traefik.http.routers.rou-netdata.service=srv-netdata
+    #   - traefik.http.services.srv-netdata.loadbalancer.server.port=19999
 
 networks:
   default:
