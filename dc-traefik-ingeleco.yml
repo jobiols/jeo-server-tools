@@ -33,6 +33,7 @@ services:
 
   aeroo:
     image: jobiols/aeroo-docs
+    restart: unless-stopped
     container_name: aeroo
 
   odoo:
