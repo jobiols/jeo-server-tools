@@ -1,0 +1,95 @@
+# Compose file odoo sams13e + https
+# Version 2020-08-09
+
+version: '3.5'
+
+services:
+  traefik:
+    image: traefik:2.2.6
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - --entrypoints.web.address=:80
+      - --log.level=DEBUG # Don't do that in production
+      - --providers.docker
+      - --api.insecure # Don't do that in production
+      - --api.debug # Don't do that in production
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /odoo_ar/traefik/:/opt/traefik/
+
+  postgres:
+    image: postgres:11.1-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+    volumes:
+      - /odoo_ar/odoo-13.0e/sams13e/postgresql:/var/lib/postgresql/data
+
+  odoo:
+    image: jobiols/odoo-ent:13.0e
+    container_name: odoo
+    restart: unless-stopped
+    volumes:
+      - /odoo_ar/odoo-13.0e/sams13e/config:/opt/odoo/etc/
+      - /odoo_ar/odoo-13.0e/sams13e/data_dir:/opt/odoo/data
+      - /odoo_ar/odoo-13.0e/sams13e/log:/var/log/odoo
+      - /odoo_ar/odoo-13.0e/sams13e/sources:/opt/odoo/custom-addons
+      - /odoo_ar/odoo-13.0e/sams13e/backup_dir:/var/odoo/backups/
+    links:
+      - postgres:db
+
+    labels:
+      # router rou-odoo --> Acceso a odoo en puerto 80
+      - traefik.http.routers.rou-odoo.rule=Method(`GET`) || Method(`POST`) || Method(`PUT`)
+      - traefik.http.routers.rou-odoo.entrypoints=web
+
+      # router rou-chat --> Acceso a /longpolling en puerto 80
+      - traefik.http.routers.rou-chat.rule=(Method(`GET`) || Method(`POST`) || Method(`PUT`)) && PathPrefix(`/longpolling`)
+      - traefik.http.routers.rou-chat.entrypoints=web
+
+      # Middleware para comprimir paginas.
+      - traefik.http.middlewares.compress.compress=true
+      
+      # Redirecciona rou-odoo al puert 8069 donde escucha odoo
+      - traefik.http.routers.rou-odoo.service=srv-odoo
+      - traefik.http.services.srv-odoo.loadbalancer.server.port=8069
+
+      # redirecciona rout-chat al puerto 8072 donde odoo escucha el longpolling
+      - traefik.http.routers.rou-chat.service=srv-chat
+      - traefik.http.services.srv-chat.loadbalancer.server.port=8072
+
+  netdata:
+    image: netdata/netdata
+    container_name: netdata
+    restart: unless-stopped
+    ports:
+      - 19999:19999
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - PGID=998  
+      # obtener el PGID
+      # grep docker /etc/group | cut -d ':' -f 3
+    # labels:
+    #   # router rou-netdata --> Acceso a netdata en puerto 80
+    #   - traefik.http.routers.rou-netdata.rule=(  Method(`GET`) || Method(`POST`) || Method(`PUT`)   ) && Path(`/netdata`)
+    #   - traefik.http.routers.rou-netdata.entrypoints=web
+
+    #   # Redirecciona rou-odoo al puert 19999 donde escucha netdata
+    #   - traefik.http.routers.rou-netdata.service=srv-netdata
+    #   - traefik.http.services.srv-netdata.loadbalancer.server.port=19999
+
+networks:
+  default:
