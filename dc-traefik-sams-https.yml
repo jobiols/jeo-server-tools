@@ -64,22 +64,25 @@ services:
       - traefik.http.routers.rou-chat.service=srv-chat
       - traefik.http.services.srv-chat.loadbalancer.server.port=8072
 
-  netdata:
-    image: netdata/netdata
-    container_name: netdata
-    restart: unless-stopped
-    ports:
-      - 19999:19999
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      - PGID=998  
+  # netdata:
+  #   image: netdata/netdata
+  #   container_name: netdata
+  #   restart: unless-stopped
+  #   ports:
+  #     - 19999:19999
+  #   cap_add:
+  #     - SYS_PTRACE
+  #   security_opt:
+  #     - apparmor:unconfined
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   environment:
+  #     - PGID=998  
+
+
+
       # obtener el PGID
       # grep docker /etc/group | cut -d ':' -f 3
     # labels:
