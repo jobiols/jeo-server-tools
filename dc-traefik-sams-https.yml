@@ -13,7 +13,8 @@ services:
     command:
       - --entrypoints.web.address=:80
       - --entryPoints.websecure.address=:443
-        #      - --log.level=DEBUG # Don't do that in production
+
+      - --log.level=DEBUG # Don't do that in production
       - --providers.docker
       - --api.insecure # Don't do that in production
       - --api.debug # Don't do that in production
@@ -124,5 +125,5 @@ services:
     #   - traefik.http.routers.rou-netdata.service=srv-netdata
     #   - traefik.http.services.srv-netdata.loadbalancer.server.port=19999
 
-networks:
-  default:
+        #networks:
+        #  default:
