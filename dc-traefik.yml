@@ -1,4 +1,4 @@
-# Compose file odoo test13 y letsencrypt
+# Compose file odoo test13 y letsencrypt.
 # Version 2020-07-18
 # Ojo hay que crear el /odoo_ar/traefik/acme.json y ponerle chmod 600
 
