@@ -65,7 +65,6 @@ services:
       # router rou-chat --> Acceso a /longpolling en puerto 80
       - traefik.http.routers.rou-chat.rule=(Host(`traf.jeosoft.com.ar`)) && PathPrefix(`/longpolling`)
       - traefik.http.routers.rou-chat.entrypoints=web
-      - traefik.http.routers.rou-chat.service=srv-chat-secure
 
       # Middleware para comprimir paginas.
 #      - traefik.http.middlewares.compress.compress=true
