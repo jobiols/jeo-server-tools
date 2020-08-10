@@ -60,10 +60,12 @@ services:
       # router rou-odoo --> Acceso a odoo en puerto 80
       - traefik.http.routers.rou-odoo.rule=Host(`traf.jeosoft.com.ar`)
       - traefik.http.routers.rou-odoo.entrypoints=web
+      - traefik.http.routers.rou-odoo.service=srv-odoo-secure
 
       # router rou-chat --> Acceso a /longpolling en puerto 80
       - traefik.http.routers.rou-chat.rule=(Host(`traf.jeosoft.com.ar`)) && PathPrefix(`/longpolling`)
       - traefik.http.routers.rou-chat.entrypoints=web
+      - traefik.http.routers.rou-chat.service=srv-chat-secure
 
       # Middleware para comprimir paginas.
 #      - traefik.http.middlewares.compress.compress=true
