@@ -1,5 +1,5 @@
-# Compose file odoo ingeleco epso + samba
-# Version 2020-07-18
+# Compose file odoo gham + samba
+# Version 2020-08-20
 
 version: '3.5'
 
@@ -22,35 +22,27 @@ services:
       - /odoo_ar/traefik/:/opt/traefik/
 
   postgres:
-    image: postgres:11.1-alpine
+    image: postgres:10.1-alpine
     container_name: postgres
     restart: unless-stopped
     environment:
       - POSTGRES_USER=odoo
       - POSTGRES_PASSWORD=odoo
     volumes:
-      - /odoo_ar/odoo-11.0/ingeleco/postgresql:/var/lib/postgresql/data
-
-  aeroo:
-    image: jobiols/aeroo-docs
-    container_name: aeroo
-    restart: unless-stopped
+      - /odoo_ar/odoo-13.0e/gham/postgresql:/var/lib/postgresql/data
 
   odoo:
-    image: jobiols/odoo-jeo:11.0
+    image: jobiols/odoo-ent:13.0e
     container_name: odoo
     restart: unless-stopped
     volumes:
-      - /odoo_ar/odoo-11.0/ingeleco/config:/opt/odoo/etc/
-      - /odoo_ar/odoo-11.0/ingeleco/data_dir:/opt/odoo/data
-      - /odoo_ar/odoo-11.0/ingeleco/log:/var/log/odoo
-      - /odoo_ar/odoo-11.0/ingeleco/sources:/opt/odoo/custom-addons
-      - /odoo_ar/odoo-11.0/ingeleco/backup_dir:/var/odoo/backups/
+      - /odoo_ar/odoo-13.0e/gham/config:/opt/odoo/etc/
+      - /odoo_ar/odoo-13.0e/gham/data_dir:/opt/odoo/data
+      - /odoo_ar/odoo-13.0e/gham/log:/var/log/odoo
+      - /odoo_ar/odoo-13.0e/gham/sources:/opt/odoo/custom-addons
+      - /odoo_ar/odoo-13.0e/gham/backup_dir:/var/odoo/backups/
     links:
       - postgres:db
-      - aeroo:aeroo
-#    environment:
-#      - ODOO_CONF=/dev/null
 
     labels:
       # router rou-odoo --> Acceso a odoo en puerto 80
@@ -91,8 +83,8 @@ services:
       - /tmp
     tty: true
     volumes:
-      - /odoo_ar/odoo-11.0/ingeleco/backup_dir:/mnt:ro
-    command: '-u "ingeleco;inge***" -s "Odoo Backup Ingeleco;/mnt;yes;yes;no;ingeleco;;;Archivos de backup diarios maximo 30 dias." -p'
+      - /odoo_ar/odoo-13.0e/gham/backup_dir:/mnt:ro
+    command: '-u "gham;gham***" -s "Odoo Backup Gham;/mnt;yes;yes;no;gham;;;Archivos de backup diarios maximo 30 dias." -p'
 
     # -s "<name;/path>[;browse;readonly;guest;users;admins;writelist;comment]"
     # -u "<username;password>[;ID;group;GID]"
@@ -113,9 +105,16 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - PGID=998  
+      # obtener el PGID
+      # grep docker /etc/group | cut -d ':' -f 3
+    # labels:
+    #   # router rou-netdata --> Acceso a netdata en puerto 80
+    #   - traefik.http.routers.rou-netdata.rule=(  Method(`GET`) || Method(`POST`) || Method(`PUT`)   ) && Path(`/netdata`)
+    #   - traefik.http.routers.rou-netdata.entrypoints=web
 
-  # obtener el PGID
-  # grep docker /etc/group | cut -d ':' -f 3
+    #   # Redirecciona rou-odoo al puert 19999 donde escucha netdata
+    #   - traefik.http.routers.rou-netdata.service=srv-netdata
+    #   - traefik.http.services.srv-netdata.loadbalancer.server.port=19999
 
 networks:
   default:
