@@ -107,14 +107,6 @@ services:
       - PGID=998  
       # obtener el PGID
       # grep docker /etc/group | cut -d ':' -f 3
-    # labels:
-    #   # router rou-netdata --> Acceso a netdata en puerto 80
-    #   - traefik.http.routers.rou-netdata.rule=(  Method(`GET`) || Method(`POST`) || Method(`PUT`)   ) && Path(`/netdata`)
-    #   - traefik.http.routers.rou-netdata.entrypoints=web
-
-    #   # Redirecciona rou-odoo al puert 19999 donde escucha netdata
-    #   - traefik.http.routers.rou-netdata.service=srv-netdata
-    #   - traefik.http.services.srv-netdata.loadbalancer.server.port=19999
 
 networks:
   default:
