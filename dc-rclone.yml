@@ -6,10 +6,9 @@
 version: '2'
 services:
   rclone-mount:
+    container_name: rclone
     image: mumiehub/rclone-mount
     restart: unless-stopped
-    ports:
-      - '80:80'
     cap_add:
       - SYS_ADMIN
     security_opt:
@@ -22,10 +21,9 @@ services:
     logging:
       options:
         max-size: 1g
-    container_name: rclone-mount
     devices:
       - /dev/fuse
     environment: 
       - 'RemotePath=gdrive:'
-      - 'MountCommands=--allow-other --allow-non-empty --buffer-size 256M'
+      - 'MountCommands=--allow-other --allow-non-empty --buffer-size 256M --vfs-cache-mode writes'
       - 'ConfigName=rclone.conf'
