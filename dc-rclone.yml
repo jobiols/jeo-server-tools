@@ -2,6 +2,15 @@
 # https://www.youtube.com/watch?v=mnDYJ2ZpdxU&t=181s
 # https://github.com/Mumie-hub/
 #
+# Crear archivo de configuracion
+# sd run -it -v ~/.config/rclone:/config/rclone rclone/rclone config
+#
+# [gdrive]
+# type = drive
+# client_id = 232374297023-r4r7pkjksvbcksi5un0k94deu7p80vk6.apps.googleusercontent.com
+# client_secret = zrjB3pACv7EAAsY5dmpEmVgz
+# scope = drive
+# token = {"access_token":"ya29.a0AfH6SMAXLhmD0mZixGZypKITwLFUFre_k8CkjS-pkm7NR6FnlA6FXHSqZGKfb1AYX3YtPtpEQx99L7fztAE0-_MZvwxQVwPjQZpqBB6wQK3Y7-OrNTIx4Ieat36NWAzc_dbjkKn47RpedCY6n6i6cHItlIZCMXBh8b8","token_type":"Bearer","refresh_token":"1//0hKAFyqgS9K8gCgYIARAAGBESNwF-L9IrldpQqehi_58BhQXvDtcBsTmYp_Do5WlTVz9lk5zne87vyyPIKyYFznRPn1kKdOxgGOw","expiry":"2020-08-22T23:43:35.614122882Z"}
 
 version: '2'
 services:
