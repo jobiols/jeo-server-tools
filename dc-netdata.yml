@@ -1,3 +1,7 @@
+# configuracion de netdata 
+# hay que tener el archivo de configuracion en /odoo_ar/netdata
+
+
 version: '3.5'
 services:
   netdata:
@@ -11,19 +15,17 @@ services:
     security_opt:
       - apparmor:unconfined
     volumes:
-#      - /odoo_ar/netdata:/usr/lib/netdata/conf.d/:ro
       - netdatalib:/var/lib/netdata
       - netdatacache:/var/cache/netdata
-#      - /etc/passwd:/host/etc/passwd:ro
-#      - /etc/group:/host/etc/group:ro
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /etc/os-release:/host/etc/os-release:ro
-    environment:
-      - PGID=999  
-  # obtener el PGID
-  # grep docker /etc/group | cut -d ':' -f 3
-
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - /odoo_ar/netdata:/etc/netdata/:ro
+    #environment:
+      # - VIRTUALIZATION=${VIRTUALIZATION}
 volumes:
   netdatalib:
   netdatacache:
