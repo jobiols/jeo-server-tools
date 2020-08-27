@@ -6,7 +6,7 @@
 # sd run -it -v ~/.config/rclone:/config/rclone rclone/rclone config
 #
 
-version: '2'
+version: '3'
 services:
   rclone-mount:
     container_name: rclone
@@ -19,8 +19,7 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - /home/jobiols/.config/rclone:/config
-      # - /mnt/gdrive:/mnt/mediaefs:shared
-      - /odoo_ar/odoo-11.0e/jeo/backup_dir:/mnt/mediaefs:shared
+      - /mnt/gdrive:/mnt/mediaefs:shared
     logging:
       options:
         max-size: 1g
